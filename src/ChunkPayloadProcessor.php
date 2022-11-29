@@ -73,13 +73,11 @@ class ChunkPayloadProcessor
             $redisStore = $this->store->getStore();
 
             // Ensure only one request can handle the original payload by using Redis Lock
-            $result = $redisStore
-                ->lock($this->payloadHashed, 0, LARAVEL_START)
+            return $redisStore
+                ->lock($this->payloadHashed, 0, microtime(true))
                 ->get(function () use ($request) {
                     return $this->restorePayloadFromChunks($request);
                 });
-            
-            return $result;
         }
 
         // Return how many chunks we collected
@@ -88,7 +86,7 @@ class ChunkPayloadProcessor
 
     /**
      * @param Request $request
-     * @return Request
+     * @return boolean
      * @throws \Exception
      */
     protected function restorePayloadFromChunks(Request $request)
@@ -104,16 +102,12 @@ class ChunkPayloadProcessor
             throw new \Exception('Received Payload Corrupted');
         }
 
-        $originalPayload = json_decode($originalPayload);
+        $originalPayload = json_decode($originalPayload, true);
 
         if ($request->getMethod() === 'POST') {
-            foreach ($originalPayload as $key => $value) {
-                $request->request->set($key, $value);
-            }
+            $request->request->replace($originalPayload);
         } else {
-            foreach ($originalPayload as $key => $value) {
-                $request->query->set($key, $value);
-            }
+            $request->query->replace($originalPayload);
         }
 
         // Clear all cached chunks
