@@ -1,10 +1,10 @@
 <?php
 
-namespace ChunkUpload\src\Middlewares;
+namespace CarroPublic\ChunkUpload\Middlewares;
 
 use Closure;
 use Illuminate\Http\Request;
-use ChunkUpload\src\ChunkPayloadProcessor;
+use CarroPublic\ChunkUpload\ChunkPayloadProcessor;
 
 class ProcessChunkedPayloadMiddleware
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace ChunkUpload\src\Cache;
+namespace CarroPublic\ChunkUpload\Cache;
 
 class RedisTaggedCache extends \Illuminate\Cache\RedisTaggedCache
 {

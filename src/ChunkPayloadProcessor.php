@@ -1,14 +1,13 @@
 <?php
 
-namespace ChunkUpload\src;
+namespace CarroPublic\ChunkUpload;
 
-use Illuminate\Cache\Lock;
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Cache\TagSet;
 use Illuminate\Cache\RedisStore;
-use ChunkUpload\src\Cache\RedisTaggedCache;
 use Illuminate\Contracts\Cache\LockProvider;
+use CarroPublic\ChunkUpload\Cache\RedisTaggedCache;
 
 class ChunkPayloadProcessor
 {
@@ -74,11 +73,13 @@ class ChunkPayloadProcessor
             $redisStore = $this->store->getStore();
 
             // Ensure only one request can handle the original payload by using Redis Lock
-            return $redisStore
+            $result = $redisStore
                 ->lock($this->payloadHashed, 0, LARAVEL_START)
                 ->get(function () use ($request) {
-                    $this->restorePayloadFromChunks($request);
+                    return $this->restorePayloadFromChunks($request);
                 });
+            
+            return $result;
         }
 
         // Return how many chunks we collected
@@ -95,7 +96,7 @@ class ChunkPayloadProcessor
         $originalPayload = '';
 
         for ($i = 0; $i < $this->totalChunks; $i++) {
-            $originalPayload += $this->store->get($i);
+            $originalPayload .= $this->store->get($i);
         }
 
         // Compare hashed to ensure the restore payload is correct
@@ -118,7 +119,7 @@ class ChunkPayloadProcessor
         // Clear all cached chunks
         $this->store->flush();
 
-        return $request;
+        return true;
     }
 
     /**
