@@ -104,6 +104,9 @@ class ChunkPayloadProcessor
 
         $originalPayload = json_decode($originalPayload, true);
 
+        # Attempt to remove the uniqueId
+        $originalPayload = Arr::except($originalPayload, ['uniqueId']);
+
         if ($request->getMethod() === 'POST') {
             $request->request->replace($originalPayload);
         } else {
