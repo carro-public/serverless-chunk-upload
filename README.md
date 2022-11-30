@@ -24,6 +24,14 @@ To be able to send larger payload, need to chunk the payload into smaller pieces
   - The previous chunks will be collected and saved in Redis Cache
   - Those request will be returned immediately after saving to Redis Cache
 
+### UniqueId
+
+Since `payload_hashed` will be used as Tag Name of Cache, so attempting to upload the same content multiple times may cause conflict between those upload
+
+To avoid this unexpected behavior, always add extra data to original payload called `uniqueId`
+- This could be any random string or current timestamp, which can be considered as unique between multiple uploads.
+- This `uniqueId` data will be deducted after restoring the original data.
+
 ### How to use
 
 ```
