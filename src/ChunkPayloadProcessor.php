@@ -6,6 +6,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use Illuminate\Cache\TagSet;
 use Illuminate\Cache\RedisStore;
+use Illuminate\Cache\RedisTagSet;
 use Illuminate\Contracts\Cache\LockProvider;
 use CarroPublic\ChunkUpload\Cache\RedisTaggedCache;
 
@@ -53,7 +54,7 @@ class ChunkPayloadProcessor
         $this->chunkIndex = $request->get(self::CHUNK_INDEX);
         $this->totalChunks = $request->get(self::TOTAL_CHUNK);
         $this->store = new RedisTaggedCache(
-            $store, new TagSet($store, Arr::wrap($this->payloadHashed))
+            $store, new RedisTagSet($store, Arr::wrap($this->payloadHashed))
         );
     }
 
