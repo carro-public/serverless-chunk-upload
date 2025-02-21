@@ -2,7 +2,7 @@
     "name": "carropublic/serverless-chunk-payload",
     "require": {
         "php": ">=7.1.0",
-        "laravel/framework": ">=5.5 <10.*"
+        "laravel/framework": ">=10.*"
     },
     "autoload": {
         "psr-4": {
