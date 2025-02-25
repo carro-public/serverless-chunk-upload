@@ -4,11 +4,10 @@ namespace CarroPublic\ChunkUpload;
 
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
-use Illuminate\Cache\TagSet;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Cache\RedisTagSet;
+use Illuminate\Cache\RedisTaggedCache;
 use Illuminate\Contracts\Cache\LockProvider;
-use CarroPublic\ChunkUpload\Cache\RedisTaggedCache;
 
 class ChunkPayloadProcessor
 {
@@ -67,7 +66,8 @@ class ChunkPayloadProcessor
     public function process(Request $request)
     {
         // Preserve the current chunked data
-        $this->store->put($this->chunkIndex, $this->chunkData);
+        // TTL 5 mins
+        $this->store->put($this->chunkIndex, $this->chunkData, 5 * 60);
 
         if ($this->hasCollectedAllChunks()) {
             /** @var LockProvider $redisStore */
@@ -82,7 +82,7 @@ class ChunkPayloadProcessor
         }
 
         // Return how many chunks we collected
-        return count($this->store->foreverKeys());
+        return $this->store->getTags()->entries()->count();
     }
 
     /**
@@ -126,7 +126,7 @@ class ChunkPayloadProcessor
      */
     protected function hasCollectedAllChunks()
     {
-        return $this->totalChunks === count($this->store->foreverKeys());
+        return $this->totalChunks === $this->store->getTags()->entries()->count();
     }
 
     /**
